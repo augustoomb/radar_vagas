@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     collection do
       post :enviar
       post :marcar_nao_aplicavel
+      post :marcar_candidatado
     end
   end
   resources :presencas, only: [ :index ]

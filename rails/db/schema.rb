@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_13_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_175425) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -46,6 +46,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_000000) do
 
   create_table "vagas", force: :cascade do |t|
     t.string "alerta"
+    t.datetime "candidatado_em"
     t.string "cargo_categoria"
     t.datetime "created_at", null: false
     t.date "detectado_em"
@@ -57,6 +58,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_000000) do
     t.string "local"
     t.string "na_lista"
     t.string "nome_na_plataforma"
+    t.text "observacoes"
     t.string "plataforma"
     t.datetime "publicado"
     t.string "status", default: "detectado", null: false
@@ -65,8 +67,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_000000) do
     t.datetime "updated_at", null: false
     t.index ["cargo_categoria"], name: "index_vagas_on_cargo_categoria"
     t.index ["link"], name: "index_vagas_on_link", unique: true
-    t.index ["plataforma", "id_externo"], name: "index_vagas_on_plataforma_and_id_externo", unique: true, where: "(id_externo IS NOT NULL)"
     t.index ["na_lista"], name: "index_vagas_on_na_lista"
+    t.index ["plataforma", "id_externo"], name: "index_vagas_on_plataforma_and_id_externo", unique: true, where: "(id_externo IS NOT NULL)"
     t.index ["plataforma"], name: "index_vagas_on_plataforma"
     t.index ["status"], name: "index_vagas_on_status"
   end

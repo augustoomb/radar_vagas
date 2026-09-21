@@ -7,6 +7,7 @@ class VagasController < ApplicationController
   def index
     @cargo_categorias = Vaga::CARGO_CATEGORIAS
     @plataformas = Vaga::PLATAFORMAS
+    @tipos = Vaga.distinct.pluck(:tipo).compact_blank.sort
     @sort = ORDENACOES.key?(params[:sort]) ? params[:sort] : "detectado_em"
     @stats = Vaga.stats_gerais
 
@@ -16,6 +17,8 @@ class VagasController < ApplicationController
     scope = scope.where(na_lista: params[:na_lista]) if params[:na_lista].present?
     scope = scope.where(cargo_categoria: params[:cargo_categoria]) if params[:cargo_categoria].present?
     scope = scope.where(status: params[:status]) if params[:status].present?
+    scope = scope.where(tipo: params[:tipo]) if params[:tipo].present?
+    scope = scope.filtrar_por_local(params[:local]) if params[:local].present?
     scope = scope.where.not(alerta: [ nil, "" ]) if params[:alerta] == "1"
 
     @pagy, @vagas = pagy(scope, limit: 20)
@@ -54,6 +57,27 @@ class VagasController < ApplicationController
       redirect_to vagas_path, alert: "Nenhuma vaga selecionada."
     else
       redirect_to vagas_path, notice: "#{total} vaga(s) marcada(s) como não aplicável."
+    end
+  end
+
+  def marcar_candidatado
+    vagas = Vaga.where(id: Array(params[:vaga_ids]), status: "detectado")
+    observacao = params[:observacao].to_s.strip.presence
+
+    total = 0
+    vagas.find_each do |vaga|
+      vaga.update!(
+        status: "candidatado",
+        candidatado_em: Time.current,
+        observacoes: observacao
+      )
+      total += 1
+    end
+
+    if total.zero?
+      redirect_to vagas_path, alert: "Nenhuma vaga selecionada."
+    else
+      redirect_to vagas_path, notice: "#{total} vaga(s) marcada(s) como candidatado."
     end
   end
 end

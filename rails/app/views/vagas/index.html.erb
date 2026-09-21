@@ -7,9 +7,11 @@
 
   <%= select_tag :cargo_categoria, options_for_select([["Todas as categorias", ""]] + @cargo_categorias, params[:cargo_categoria]) %>
   <%= select_tag :plataforma, options_for_select([["Todas as plataformas", ""]] + @plataformas, params[:plataforma]) %>
+  <%= select_tag :tipo, options_for_select([["Todos os tipos", ""]] + @tipos, params[:tipo]) %>
+  <%= text_field_tag :local, params[:local], placeholder: "Filtrar por local (ex: BH, Contagem, MG)" %>
   <%= select_tag :sort, options_for_select([["Mais recentes", "detectado_em"], ["Publicado", "publicado"]], @sort) %>
   <%= select_tag :na_lista, options_for_select([["Todas", ""], ["Na lista: Sim", "Sim"], ["Na lista: Não", "Não"]], params[:na_lista]) %>
-  <%= select_tag :status, options_for_select([["Todas", ""], ["Detectadas", "detectado"], ["Enviadas", "enviada"], ["Não aplicável", "nao_aplicavel"]], params[:status]) %>
+  <%= select_tag :status, options_for_select([["Todas", ""], ["Detectadas", "detectado"], ["Candidatadas", "candidatado"], ["Enviadas", "enviada"], ["Não aplicável", "nao_aplicavel"]], params[:status]) %>
 
   <label class="chk"><%= check_box_tag :alerta, "1", params[:alerta] == "1" %> só com alerta</label>
 
@@ -54,6 +56,8 @@
                 <span class="badge-status enviada" title="<%= vaga.jobsync_job_id %>">enviada <%= vaga.enviado_em&.strftime("%d/%m") %></span>
               <% elsif vaga.status == "nao_aplicavel" %>
                 <span class="badge-status nao-aplicavel">não aplicável</span>
+              <% elsif vaga.status == "candidatado" %>
+                <span class="badge-status candidatado" title="<%= vaga.observacoes %>">candidatado <%= vaga.candidatado_em&.strftime("%d/%m") %></span>
               <% else %>
                 <span class="badge-status detectado">detectada</span>
               <% end %>
@@ -69,8 +73,13 @@
   </div>
 
   <div class="bulk-actions">
+    <%= text_field_tag :observacao, params[:observacao], placeholder: "Observação (opcional) para candidaturas", class: "bulk-observacao", data: { "bulk-select-target": "submit" } %>
+
     <button type="submit" class="btn" data-bulk-select-target="submit" disabled>
       Enviar <span data-bulk-select-target="count">0</span> vaga(s) pro JobSync
+    </button>
+    <button type="submit" formaction="<%= marcar_candidatado_vagas_path %>" class="btn btn-candidatado" data-bulk-select-target="submit" disabled>
+      Marcar <span data-bulk-select-target="count">0</span> como candidatado
     </button>
     <button type="submit" formaction="<%= marcar_nao_aplicavel_vagas_path %>" class="clear-btn" data-bulk-select-target="submit" disabled>
       Marcar como não aplicável

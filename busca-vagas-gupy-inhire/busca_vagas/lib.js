@@ -27,15 +27,89 @@ function tokens(s) {
 }
 
 // Role matching against a job title. Returns canonical role label or null.
-// Escopo DevOps/Cloud/Infra (perfil do candidato) — ordem importa: mais
-// específico primeiro (Kubernetes antes de DevOps genérico, etc).
+// Escopo: Java / Backend / Java+Backend / Software Engineer / Analista Dev Júnior.
 function matchRole(title) {
-  const t = ' ' + String(title).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ') + ' ';
+  const t = ' ' + String(title)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ') + ' ';
+
   const has = (re) => re.test(t);
-  if (has(/ kubernetes /) || has(/ k8s /)) return 'Kubernetes Engineer';
-  if (has(/ devops /) || has(/ dev ops /) || has(/ sre /) || has(/ site reliability /)) return 'DevOps Engineer / SRE';
-  if (has(/ cloud /) || has(/ nuvem /) || has(/ platform engineer /)) return 'Cloud Engineer / Cloud Security / Platform Engineer';
-  if (has(/ infraestrutura /) || has(/ sysadmin /) || has(/ system administrator /) || has(/ infrastructure engineer /) || has(/ administrador de redes /) || has(/ administrador de sistemas /)) return 'Infraestrutura / Sysadmin';
+
+  // Java + Backend Júnior (títulos combinados)
+  if (
+    has(/ desenvolvedor java backend junior /) ||
+    has(/ desenvolvedor java backend jr /) ||
+    has(/ desenvolvedor backend java junior /) ||
+    has(/ desenvolvedor backend java jr /) ||
+    has(/ desenvolvedor java back end junior /) ||
+    has(/ desenvolvedor java back end jr /) ||
+    has(/ desenvolvedor back end java junior /) ||
+    has(/ desenvolvedor back end java jr /) ||
+    has(/ java backend developer junior /) ||
+    has(/ java backend developer jr /) ||
+    has(/ backend java developer junior /) ||
+    has(/ backend java developer jr /)
+  ) {
+    return 'Java Backend Developer Júnior';
+  }
+
+  // Java Júnior
+  if (
+    has(/ desenvolvedor java junior /) ||
+    has(/ desenvolvedor java jr /) ||
+    has(/ desenvolvedor java i /) ||
+    has(/ programador java junior /) ||
+    has(/ programador java jr /) ||
+    has(/ programador java i /) ||
+    has(/ junior java developer /) ||
+    has(/ jr java developer /) ||
+    has(/ java developer i /) ||
+    has(/ junior java engineer /) ||
+    has(/ jr java engineer /) ||
+    has(/ analista desenvolvedor java junior /) ||
+    has(/ analista desenvolvedor java jr /) ||
+    has(/ analista de desenvolvimento java junior /) ||
+    has(/ analista de desenvolvimento java jr /)
+  ) {
+    return 'Java Developer Júnior';
+  }
+
+  // Backend Júnior
+  if (
+    has(/ desenvolvedor backend junior /) ||
+    has(/ desenvolvedor backend jr /) ||
+    has(/ desenvolvedor back end junior /) ||
+    has(/ desenvolvedor back end jr /) ||
+    has(/ backend developer junior /) ||
+    has(/ backend developer jr /) ||
+    has(/ back end developer junior /) ||
+    has(/ back end developer jr /) ||
+    has(/ analista backend junior /) ||
+    has(/ analista backend jr /) ||
+    has(/ analista de desenvolvimento backend junior /) ||
+    has(/ analista de desenvolvimento backend jr /)
+  ) {
+    return 'Backend Developer Júnior';
+  }
+
+  // Software Engineer / Desenvolvedor de Software Júnior
+  if (
+    has(/ software engineer junior /) ||
+    has(/ software engineer jr /) ||
+    has(/ software engineer i /) ||
+    has(/ desenvolvedor de software junior /) ||
+    has(/ desenvolvedor de software jr /) ||
+    has(/ desenvolvedor de software i /) ||
+    has(/ analista desenvolvedor junior /) ||
+    has(/ analista desenvolvedor jr /) ||
+    has(/ analista de desenvolvimento junior /) ||
+    has(/ analista de desenvolvimento jr /)
+  ) {
+    return 'Software Engineer Júnior';
+  }
+
   return null;
 }
 

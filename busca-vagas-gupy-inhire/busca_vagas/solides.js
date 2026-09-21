@@ -3,10 +3,10 @@ const path = require('path');
 const { DIR, loadCompanies, compact, matchRole, isRemote, slugify, sleep } = require('./lib.js');
 
 const QUERIES = [
-  'DevOps', 'SRE', 'Site Reliability Engineer',
-  'Cloud', 'Cloud Engineer', 'Cloud Security', 'Analista Cloud', 'Nuvem', 'Platform Engineer',
-  'Kubernetes',
-  'Infraestrutura', 'Analista de Infraestrutura', 'Sysadmin', 'Administrador de Sistemas'
+  'Java', 'Java Developer', 'Desenvolvedor Java', 'Programador Java',
+  'Backend Java', 'Java Backend', 'Desenvolvedor Backend', 'Backend Developer',
+  'Software Engineer', 'Desenvolvedor de Software',
+  'Analista Desenvolvedor', 'Analista de Desenvolvimento'
 ];
 
 const API = 'https://apigw.solides.com.br/jobs/v3/portal-vacancies-new';
@@ -68,14 +68,12 @@ async function fetchAll(q) {
   console.log(`[solides] unique jobs pooled: ${byId.size}`);
 
   const results = [];
-  let remoteCount = 0, roleCount = 0, inList = 0, outList = 0;
+  let roleCount = 0, inList = 0, outList = 0;
   for (const j of byId.values()) {
     jobTypeValues.add(j.jobType);
     const role = matchRole(j.title);
     if (!role) continue;
     roleCount++;
-    if (!isRemote(j.jobType, j.homeOffice)) continue;
-    remoteCount++;
     const company = matchCompany(j.companyName);
     if (company) inList++; else outList++;
     results.push({
@@ -100,7 +98,7 @@ async function fetchAll(q) {
     });
   }
   console.log(`[solides] jobType values seen: ${[...jobTypeValues].join(', ')}`);
-  console.log(`[solides] role-matched=${roleCount} remote=${remoteCount} -> rows=${results.length} (in-list=${inList}, fora-da-lista=${outList})`);
+  console.log(`[solides] role-matched=${roleCount} -> rows=${results.length} (in-list=${inList}, fora-da-lista=${outList})`);
   fs.writeFileSync(path.join(DIR, 'solides_results.json'), JSON.stringify(results, null, 2));
   console.log(`[solides] wrote ${results.length} rows -> solides_results.json`);
 

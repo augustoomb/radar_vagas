@@ -101,6 +101,7 @@ tr:hover td{background:var(--panel-2);}
 .badge-status.detectado{color:var(--warn);background:var(--warn-dim);border-color:#5A4014;}
 .badge-status.enviada{color:var(--ok);background:var(--ok-dim);border-color:#12513f;}
 .badge-status.nao-aplicavel{color:var(--danger);background:var(--danger-dim);border-color:#5a1424;}
+.badge-status.candidatado{color:#2563eb;background:#dbeafe;border-color:#1e40af;}
 .plataforma-gupy{color:#B892FF;}
 .plataforma-inhire{color:var(--accent);}
 .plataforma-solides{color:var(--ok);}

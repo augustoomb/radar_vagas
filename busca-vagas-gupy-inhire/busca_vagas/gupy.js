@@ -3,10 +3,19 @@ const path = require('path');
 const { DIR, loadCompanies, compact, matchRole, isRemote, sleep } = require('./lib.js');
 
 const QUERIES = [
-  'DevOps', 'SRE', 'Site Reliability Engineer',
-  'Cloud', 'Cloud Engineer', 'Cloud Security', 'Analista Cloud', 'Nuvem', 'Platform Engineer',
-  'Kubernetes',
-  'Infraestrutura', 'Analista de Infraestrutura', 'Sysadmin', 'Administrador de Sistemas'
+  'Java',
+  'Java Developer',
+  'Desenvolvedor Java',
+  'Programador Java',
+  'Backend Java',
+  'Java Backend',
+  'Desenvolvedor Backend',
+  'Backend Developer',
+  'Backend Engineer',
+  'Software Engineer',
+  'Desenvolvedor de Software',
+  'Analista Desenvolvedor',
+  'Analista de Desenvolvimento'
 ];
 
 const API = 'https://employability-portal.gupy.io/api/v1/jobs';
@@ -68,14 +77,12 @@ async function fetchAll(q) {
   console.log(`[gupy] unique jobs pooled: ${byId.size}`);
 
   const results = [];
-  let remoteCount = 0, roleCount = 0, inList = 0, outList = 0;
+  let roleCount = 0, inList = 0, outList = 0;
   for (const j of byId.values()) {
     wpValues.add(j.workplaceType);
     const role = matchRole(j.name);
     if (!role) continue;
     roleCount++;
-    if (!isRemote(j.workplaceType, j.isRemoteWork)) continue;
-    remoteCount++;
     const company = matchCompany(j.careerPageName);
     if (company) inList++; else outList++;
     results.push({
@@ -92,7 +99,7 @@ async function fetchAll(q) {
     });
   }
   console.log(`[gupy] workplaceType values seen: ${[...wpValues].join(', ')}`);
-  console.log(`[gupy] role-matched=${roleCount} remote=${remoteCount} -> rows=${results.length} (in-list=${inList}, fora-da-lista=${outList})`);
+  console.log(`[gupy] role-matched=${roleCount} -> rows=${results.length} (in-list=${inList}, fora-da-lista=${outList})`);
   fs.writeFileSync(path.join(DIR, 'gupy_results.json'), JSON.stringify(results, null, 2));
   console.log(`[gupy] wrote ${results.length} rows -> gupy_results.json`);
 

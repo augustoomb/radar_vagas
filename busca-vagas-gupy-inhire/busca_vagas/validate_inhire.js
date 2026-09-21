@@ -80,14 +80,13 @@ function nameMatches(company, tenantName) {
   const inList = all.filter(t=>t.listCompany);
   const outList = all.filter(t=>!t.listCompany);
 
-  // build remote+role vacancies from ALL tenants
+  // build role vacancies from ALL tenants (modalidade filtrada no merge)
   const vagas = [];
   for (const t of all) {
     for (const j of t.jobs) {
       if (j.status && String(j.status).toLowerCase() !== 'published') continue;
       const role = matchRole(j.displayName);
-      const wp = String(j.workplaceType||'').toLowerCase();
-      if (!role || !wp.includes('remote')) continue;
+      if (!role) continue;
       vagas.push({
         platform:'InHire', companyList: t.listCompany || '', companyInhire: t.tenantName,
         role, jobTitle: j.displayName, workplaceType: j.workplaceType, location: j.location||'',

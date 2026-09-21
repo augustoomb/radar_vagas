@@ -1,7 +1,9 @@
 #!/bin/bash -e
 
-# If running the rails server then create or migrate existing database
-if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+# If running the rails server then create or migrate existing database.
+# Works for both production (./bin/rails server) and dev (bin/rails server -b 0.0.0.0),
+# but skips tailwindcss:watch and other non-server rails commands.
+if [[ "$*" == *"rails"* ]] && [[ "$*" == *"server"* ]] && [[ "$*" != *"tailwindcss"* ]]; then
   ./bin/rails db:prepare
 fi
 

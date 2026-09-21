@@ -66,9 +66,7 @@ function nameMatches(companyName, tenantName) {
       for (const j of jobs) {
         if (String(j.status || '').toLowerCase() !== 'published' && j.status) continue;
         const role = matchRole(j.displayName);
-        const wp = String(j.workplaceType || '').toLowerCase();
-        const remote = wp.includes('remote') || wp.includes('remoto');
-        if (!role || !remote) continue;
+        if (!role) continue;
         results.push({
           platform: 'InHire',
           companyList: company,

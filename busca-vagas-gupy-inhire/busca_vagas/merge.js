@@ -7,31 +7,61 @@ const inhire = JSON.parse(fs.readFileSync(path.join(DIR, 'inhire_results.json'),
 const solides = JSON.parse(fs.readFileSync(path.join(DIR, 'solides_results.json'), 'utf8'));
 
 function norm(s){return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();}
+
+function isRemoteType(workplaceType){
+  const w = norm(workplaceType || '');
+  return w.includes('remote') || w.includes('remoto') || w.includes('home office') || w.includes('homeoffice') || w.includes('trabalho remoto');
+}
+
+function isLocalOk(location){
+  const loc = norm(location || '');
+  // remoto já é tratado separadamente; vazio aceitamos como incerto
+  if (loc === '') return true;
+  const bh = /\bbelo horizonte\b|\bbh\b/.test(loc);
+  const contagem = /\bcontagem\b/.test(loc);
+  const mg = /\bminas gerais\b|\bmg\b/.test(loc);
+  return bh || contagem || mg;
+}
+
+function manterVaga(row){
+  const remote = isRemoteType(row.workplaceType);
+  if (remote) return true;
+  // híbrido/presencial só mantém se for BH/Contagem/MG
+  return isLocalOk(row.location);
+}
+
 function alerta(row){
   const t = norm(row.jobTitle);
   const notes = [];
-  if (/hibrid|presencial|on-?site/.test(t)) notes.push('título menciona híbrido/presencial — conferir');
+  const remote = isRemoteType(row.workplaceType);
   const loc = norm(row.location);
+  const localOk = isLocalOk(row.location);
+
+  if (!remote && /hibrid|presencial|on-?site|hibrido/.test(t)) notes.push('título menciona híbrido/presencial — conferir');
+  if (!remote && !localOk) notes.push('local não é BH/Contagem/MG — conferir');
+
   const brOk = loc === '' || /\bbr\b|brasil|brazil/.test(loc);
   const foreign = /\b(us|usa|eua|singapore|sg|portugal|pt|mexico|argentina|spain|espanha|uk|remote latam|north america)\b/.test(loc);
   if (!brOk && foreign) notes.push('local fora do BR — pode exigir inglês');
   return notes.join('; ');
 }
 
-const all = [...gupy, ...inhire, ...solides].map(r => ({
-  empresa: r.companyList,
-  plataforma: r.platform,
-  na_lista: r.na_lista || 'Sim',
-  cargo_categoria: r.role,
-  titulo_vaga: r.jobTitle.trim(),
-  tipo: r.workplaceType,
-  local: r.location,
-  link: r.url,
-  id_externo: r.idExterno || null,
-  nome_na_plataforma: r.companyGupy || r.companyInhire || r.companySolides || '',
-  publicado: r.publishedDate || '',
-  alerta: alerta(r)
-}));
+const all = [...gupy, ...inhire, ...solides]
+  .filter(manterVaga)
+  .map(r => ({
+    empresa: r.companyList,
+    plataforma: r.platform,
+    na_lista: r.na_lista || 'Sim',
+    cargo_categoria: r.role,
+    titulo_vaga: r.jobTitle.trim(),
+    tipo: r.workplaceType,
+    local: r.location,
+    link: r.url,
+    id_externo: r.idExterno || null,
+    nome_na_plataforma: r.companyGupy || r.companyInhire || r.companySolides || '',
+    publicado: r.publishedDate || '',
+    alerta: alerta(r)
+  }));
 
 // dedupe by link, then by empresa+titulo
 const seen = new Set();
